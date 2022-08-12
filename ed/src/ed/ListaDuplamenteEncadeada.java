@@ -1,20 +1,28 @@
 package ed;
 
-public class ListaEncadeada {
-	
+public class ListaDuplamenteEncadeada {
 	private Celula primeira = null;//A celula sabe qual é a primeira posição após ela
 	private Celula ultima = null; // ponteiro para a última posição da LinkedList
 	private int totalElemetos = 0;
 
 	public void adicionaNoComeco(Object elemento) {
-		Celula nova = new Celula(elemento, primeira);
-//		System.out.println(nova.toString());
-		this.primeira = nova;// a variável primeira sempre aponta para o endereço da nova celula inserida
-//		System.out.println("primeira -> eu aponto para: " + nova);//para quem aponta a primeira
+		
 		if(totalElemetos == 0) {
-			//se a lista está vazia o ponteiro para o último será igual o ponteiro para o primeiro
-			this.ultima = this.primeira;
+			Celula nova = new Celula(elemento);
+			this.primeira = nova; // o ponteiro que nos diz qual é a primeira celula aponta para nova
+			this.ultima = nova; // como a lista era vazia o ponteiro última também aponta para nova.
+		} else {
+			//System.out.println(this.primeira.toString());
+			Celula nova = new Celula(elemento, this.primeira);//o ponteiro que diz qual é a primeira aponta para a nova celula criada
+			//A celula recebe o elemento "Paulo" e o ponteiro que aponta para "Mauricio", mauricio é o próximo de Paulo
+			this.primeira.setAnterior(nova);
+			// this.primeira é mauricio, agora passamos o ponteiro anterior apontando para nova que é paulo
+			this.primeira = nova;
+			// e agora dizemos que o ponteiro que nos diz que é a primeira celula agora é nova, ou seja, paulo
+			//System.out.println(this.primeira.toString());
+			
 		}
+		
 		this.totalElemetos++;//Variável que guarda a quantidade de elementos da nossa LnkedList
 		
 	}
@@ -23,12 +31,10 @@ public class ListaEncadeada {
 		if(this.totalElemetos == 0) {
 			this.adicionaNoComeco(elemento);
 		} else {
-			Celula nova = new Celula(elemento, null);//nova celula com o ponteiro do próximo como null
-//			System.out.println(nova.toString());
-			this.ultima.setProximo(nova);//agora o ponteiro último aponta para a referência nova, dizendo que ela a próxima da lista, esse passo é necessário pois a variável próxima estava apontando para a celula anterior
-//			System.out.println(this.ultima.toString());
-			this.ultima = nova;// aqui estamos apontando para o endereço da nova celula
-//			System.out.println("ultima -> eu aponto para: " + nova);
+			Celula nova = new Celula(elemento);// nova = joão
+			this.ultima.setProximo(nova);// João agora é próximo de mauricio
+			nova.setAnterior(this.ultima);// o anterior de João agora é mauricio
+			this.ultima = nova;// e agora a ultima celula é joão, o ponteiro ultima aponta para João
 			this.totalElemetos++;
 		}
 	}
@@ -55,13 +61,13 @@ public class ListaEncadeada {
 		} else if(posicao == this.totalElemetos) {
 			adiciona(elemento);
 		} else {
-		Celula anterior = this.pegaCelula(posicao - 1);//anterior agora está apontando para a celula anterior a posição que quermos inserir a nova celula
-//		System.out.println("Anterior :" + anterior.toString());
-		Celula nova = new Celula(elemento, anterior.getProximo());// agora celula inserida vai pegar o próximo da posicao anteior
-//		System.out.println("Sou a celula nova: "+nova.toString());
-		anterior.setProximo(nova);// e agora o próximo do anterio é a celula que foi inserida
-//		System.out.println("próximo do anterior "+ anterior.getProximo().toString());
-//		System.out.println("próximo da nova celula: "+ nova.getProximo().toString());
+		Celula anterior = this.pegaCelula(posicao - 1);//anterior = paulo
+		Celula proxima = anterior.getProximo();
+		
+		Celula nova = new Celula(elemento, anterior.getProximo());//próximo de will é paulo
+		nova.setAnterior(anterior);;//anterior de Will agora quem era o próximo de paulo, ou seja, mauricio
+		anterior.setProximo(nova);//o anterior de paulo agora é will
+		proxima.setAnterior(nova);// e o próximo de mauricio = anterior.getAnterior() é will
 		this.totalElemetos++;
 		}
 		
@@ -85,16 +91,23 @@ public class ListaEncadeada {
 	}
 	
 	public void remove(int posicao) {
-		
+		if(posicao == 0) {
+			this.removeDoComeco();
+		} else if (posicao == totalElemetos - 1) {
+			this.removeDoFim();
+		} else {
+			Celula anterior = this.pegaCelula(posicao - 1);
+			Celula proxima = this.pegaCelula(posicao + 1);
+			anterior.setProximo(proxima);
+			proxima.setAnterior(anterior);
+			this.totalElemetos--;
+		}
 	}
 	
 	public int tamanho() {
 		return this.totalElemetos;
 	}
 	
-	public boolean contem(Object o) {
-		return false;
-	}
 	
 	@Override
 	public String toString() {
@@ -114,5 +127,29 @@ public class ListaEncadeada {
 		}
 		builder.append("]");
 		return builder.toString();
+	}
+	
+	public void removeDoFim() {
+		if(totalElemetos == 1) {
+			this.removeDoComeco();
+		} else {
+			Celula penultima = this.ultima.getAnterior();// pegando a penultima celula
+			penultima.setProximo(null);
+			this.ultima = penultima;
+			this.totalElemetos--;
+		}
+		
+	}
+	
+	public boolean contem(Object elemento) {
+		Celula atual = this.primeira;
+		while(atual != null) {
+			if(atual.getElemento().equals(elemento)) {
+				return true;
+			} else {
+				atual = atual.getProximo();
+			}
+		}
+		return false;
 	}
 }

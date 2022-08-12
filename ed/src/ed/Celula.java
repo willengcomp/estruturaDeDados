@@ -3,6 +3,12 @@ package ed;
 public class Celula {
 	private Object elemento;
 	private Celula proximo; //próximo é a variálve que faz que a celulá anterio saiba qual será a próxima celula após ela
+	private Celula anterior;//ponteiro do Tipo Celula para apontar para a celula anterior 
+	
+	
+	public Celula(Object elemento) {
+		this(elemento, null);	
+	}
 	
 	public Celula(Object elemento, Celula proximo) {//ctrl + 3 é o atalho de busca
 		//Construtor para criar uma celula
@@ -26,6 +32,14 @@ public class Celula {
 
 	public Object getElemento() {
 		return elemento;
+	}
+	
+	public Celula getAnterior() {
+		return anterior;
+	}
+	
+	public void setAnterior(Celula anterior) {
+		this.anterior = anterior;
 	}
 	
 }
